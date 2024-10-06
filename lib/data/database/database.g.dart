@@ -29,6 +29,12 @@ class $ClientTableTable extends ClientTable
   late final GeneratedColumn<String> horario = GeneratedColumn<String>(
       'horario', aliasedName, false,
       type: DriftSqlType.string, requiredDuringInsert: true);
+  static const VerificationMeta _descricaoMeta =
+      const VerificationMeta('descricao');
+  @override
+  late final GeneratedColumn<String> descricao = GeneratedColumn<String>(
+      'descricao', aliasedName, false,
+      type: DriftSqlType.string, requiredDuringInsert: true);
   static const VerificationMeta _dateCreateMeta =
       const VerificationMeta('dateCreate');
   @override
@@ -43,7 +49,7 @@ class $ClientTableTable extends ClientTable
       type: DriftSqlType.dateTime, requiredDuringInsert: true);
   @override
   List<GeneratedColumn> get $columns =>
-      [id, name, horario, dateCreate, dateUpdate];
+      [id, name, horario, descricao, dateCreate, dateUpdate];
   @override
   String get aliasedName => _alias ?? actualTableName;
   @override
@@ -68,6 +74,12 @@ class $ClientTableTable extends ClientTable
           horario.isAcceptableOrUnknown(data['horario']!, _horarioMeta));
     } else if (isInserting) {
       context.missing(_horarioMeta);
+    }
+    if (data.containsKey('descricao')) {
+      context.handle(_descricaoMeta,
+          descricao.isAcceptableOrUnknown(data['descricao']!, _descricaoMeta));
+    } else if (isInserting) {
+      context.missing(_descricaoMeta);
     }
     if (data.containsKey('dateCreate')) {
       context.handle(
@@ -100,6 +112,8 @@ class $ClientTableTable extends ClientTable
           .read(DriftSqlType.string, data['${effectivePrefix}name'])!,
       horario: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}horario'])!,
+      descricao: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}descricao'])!,
       dateCreate: attachedDatabase.typeMapping
           .read(DriftSqlType.dateTime, data['${effectivePrefix}dateCreate'])!,
       dateUpdate: attachedDatabase.typeMapping
@@ -117,12 +131,14 @@ class ClientTableData extends DataClass implements Insertable<ClientTableData> {
   final int id;
   final String name;
   final String horario;
+  final String descricao;
   final DateTime dateCreate;
   final DateTime dateUpdate;
   const ClientTableData(
       {required this.id,
       required this.name,
       required this.horario,
+      required this.descricao,
       required this.dateCreate,
       required this.dateUpdate});
   @override
@@ -131,6 +147,7 @@ class ClientTableData extends DataClass implements Insertable<ClientTableData> {
     map['id'] = Variable<int>(id);
     map['name'] = Variable<String>(name);
     map['horario'] = Variable<String>(horario);
+    map['descricao'] = Variable<String>(descricao);
     map['dateCreate'] = Variable<DateTime>(dateCreate);
     map['dateUpdate'] = Variable<DateTime>(dateUpdate);
     return map;
@@ -141,6 +158,7 @@ class ClientTableData extends DataClass implements Insertable<ClientTableData> {
       id: Value(id),
       name: Value(name),
       horario: Value(horario),
+      descricao: Value(descricao),
       dateCreate: Value(dateCreate),
       dateUpdate: Value(dateUpdate),
     );
@@ -153,6 +171,7 @@ class ClientTableData extends DataClass implements Insertable<ClientTableData> {
       id: serializer.fromJson<int>(json['id']),
       name: serializer.fromJson<String>(json['name']),
       horario: serializer.fromJson<String>(json['horario']),
+      descricao: serializer.fromJson<String>(json['descricao']),
       dateCreate: serializer.fromJson<DateTime>(json['dateCreate']),
       dateUpdate: serializer.fromJson<DateTime>(json['dateUpdate']),
     );
@@ -164,6 +183,7 @@ class ClientTableData extends DataClass implements Insertable<ClientTableData> {
       'id': serializer.toJson<int>(id),
       'name': serializer.toJson<String>(name),
       'horario': serializer.toJson<String>(horario),
+      'descricao': serializer.toJson<String>(descricao),
       'dateCreate': serializer.toJson<DateTime>(dateCreate),
       'dateUpdate': serializer.toJson<DateTime>(dateUpdate),
     };
@@ -173,12 +193,14 @@ class ClientTableData extends DataClass implements Insertable<ClientTableData> {
           {int? id,
           String? name,
           String? horario,
+          String? descricao,
           DateTime? dateCreate,
           DateTime? dateUpdate}) =>
       ClientTableData(
         id: id ?? this.id,
         name: name ?? this.name,
         horario: horario ?? this.horario,
+        descricao: descricao ?? this.descricao,
         dateCreate: dateCreate ?? this.dateCreate,
         dateUpdate: dateUpdate ?? this.dateUpdate,
       );
@@ -187,6 +209,7 @@ class ClientTableData extends DataClass implements Insertable<ClientTableData> {
       id: data.id.present ? data.id.value : this.id,
       name: data.name.present ? data.name.value : this.name,
       horario: data.horario.present ? data.horario.value : this.horario,
+      descricao: data.descricao.present ? data.descricao.value : this.descricao,
       dateCreate:
           data.dateCreate.present ? data.dateCreate.value : this.dateCreate,
       dateUpdate:
@@ -200,6 +223,7 @@ class ClientTableData extends DataClass implements Insertable<ClientTableData> {
           ..write('id: $id, ')
           ..write('name: $name, ')
           ..write('horario: $horario, ')
+          ..write('descricao: $descricao, ')
           ..write('dateCreate: $dateCreate, ')
           ..write('dateUpdate: $dateUpdate')
           ..write(')'))
@@ -207,7 +231,8 @@ class ClientTableData extends DataClass implements Insertable<ClientTableData> {
   }
 
   @override
-  int get hashCode => Object.hash(id, name, horario, dateCreate, dateUpdate);
+  int get hashCode =>
+      Object.hash(id, name, horario, descricao, dateCreate, dateUpdate);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -215,6 +240,7 @@ class ClientTableData extends DataClass implements Insertable<ClientTableData> {
           other.id == this.id &&
           other.name == this.name &&
           other.horario == this.horario &&
+          other.descricao == this.descricao &&
           other.dateCreate == this.dateCreate &&
           other.dateUpdate == this.dateUpdate);
 }
@@ -223,12 +249,14 @@ class ClientTableCompanion extends UpdateCompanion<ClientTableData> {
   final Value<int> id;
   final Value<String> name;
   final Value<String> horario;
+  final Value<String> descricao;
   final Value<DateTime> dateCreate;
   final Value<DateTime> dateUpdate;
   const ClientTableCompanion({
     this.id = const Value.absent(),
     this.name = const Value.absent(),
     this.horario = const Value.absent(),
+    this.descricao = const Value.absent(),
     this.dateCreate = const Value.absent(),
     this.dateUpdate = const Value.absent(),
   });
@@ -236,16 +264,19 @@ class ClientTableCompanion extends UpdateCompanion<ClientTableData> {
     this.id = const Value.absent(),
     required String name,
     required String horario,
+    required String descricao,
     required DateTime dateCreate,
     required DateTime dateUpdate,
   })  : name = Value(name),
         horario = Value(horario),
+        descricao = Value(descricao),
         dateCreate = Value(dateCreate),
         dateUpdate = Value(dateUpdate);
   static Insertable<ClientTableData> custom({
     Expression<int>? id,
     Expression<String>? name,
     Expression<String>? horario,
+    Expression<String>? descricao,
     Expression<DateTime>? dateCreate,
     Expression<DateTime>? dateUpdate,
   }) {
@@ -253,6 +284,7 @@ class ClientTableCompanion extends UpdateCompanion<ClientTableData> {
       if (id != null) 'id': id,
       if (name != null) 'name': name,
       if (horario != null) 'horario': horario,
+      if (descricao != null) 'descricao': descricao,
       if (dateCreate != null) 'dateCreate': dateCreate,
       if (dateUpdate != null) 'dateUpdate': dateUpdate,
     });
@@ -262,12 +294,14 @@ class ClientTableCompanion extends UpdateCompanion<ClientTableData> {
       {Value<int>? id,
       Value<String>? name,
       Value<String>? horario,
+      Value<String>? descricao,
       Value<DateTime>? dateCreate,
       Value<DateTime>? dateUpdate}) {
     return ClientTableCompanion(
       id: id ?? this.id,
       name: name ?? this.name,
       horario: horario ?? this.horario,
+      descricao: descricao ?? this.descricao,
       dateCreate: dateCreate ?? this.dateCreate,
       dateUpdate: dateUpdate ?? this.dateUpdate,
     );
@@ -285,6 +319,9 @@ class ClientTableCompanion extends UpdateCompanion<ClientTableData> {
     if (horario.present) {
       map['horario'] = Variable<String>(horario.value);
     }
+    if (descricao.present) {
+      map['descricao'] = Variable<String>(descricao.value);
+    }
     if (dateCreate.present) {
       map['dateCreate'] = Variable<DateTime>(dateCreate.value);
     }
@@ -300,6 +337,7 @@ class ClientTableCompanion extends UpdateCompanion<ClientTableData> {
           ..write('id: $id, ')
           ..write('name: $name, ')
           ..write('horario: $horario, ')
+          ..write('descricao: $descricao, ')
           ..write('dateCreate: $dateCreate, ')
           ..write('dateUpdate: $dateUpdate')
           ..write(')'))
@@ -323,6 +361,7 @@ typedef $$ClientTableTableCreateCompanionBuilder = ClientTableCompanion
   Value<int> id,
   required String name,
   required String horario,
+  required String descricao,
   required DateTime dateCreate,
   required DateTime dateUpdate,
 });
@@ -331,6 +370,7 @@ typedef $$ClientTableTableUpdateCompanionBuilder = ClientTableCompanion
   Value<int> id,
   Value<String> name,
   Value<String> horario,
+  Value<String> descricao,
   Value<DateTime> dateCreate,
   Value<DateTime> dateUpdate,
 });
@@ -350,6 +390,11 @@ class $$ClientTableTableFilterComposer
 
   ColumnFilters<String> get horario => $state.composableBuilder(
       column: $state.table.horario,
+      builder: (column, joinBuilders) =>
+          ColumnFilters(column, joinBuilders: joinBuilders));
+
+  ColumnFilters<String> get descricao => $state.composableBuilder(
+      column: $state.table.descricao,
       builder: (column, joinBuilders) =>
           ColumnFilters(column, joinBuilders: joinBuilders));
 
@@ -379,6 +424,11 @@ class $$ClientTableTableOrderingComposer
 
   ColumnOrderings<String> get horario => $state.composableBuilder(
       column: $state.table.horario,
+      builder: (column, joinBuilders) =>
+          ColumnOrderings(column, joinBuilders: joinBuilders));
+
+  ColumnOrderings<String> get descricao => $state.composableBuilder(
+      column: $state.table.descricao,
       builder: (column, joinBuilders) =>
           ColumnOrderings(column, joinBuilders: joinBuilders));
 
@@ -419,6 +469,7 @@ class $$ClientTableTableTableManager extends RootTableManager<
             Value<int> id = const Value.absent(),
             Value<String> name = const Value.absent(),
             Value<String> horario = const Value.absent(),
+            Value<String> descricao = const Value.absent(),
             Value<DateTime> dateCreate = const Value.absent(),
             Value<DateTime> dateUpdate = const Value.absent(),
           }) =>
@@ -426,6 +477,7 @@ class $$ClientTableTableTableManager extends RootTableManager<
             id: id,
             name: name,
             horario: horario,
+            descricao: descricao,
             dateCreate: dateCreate,
             dateUpdate: dateUpdate,
           ),
@@ -433,6 +485,7 @@ class $$ClientTableTableTableManager extends RootTableManager<
             Value<int> id = const Value.absent(),
             required String name,
             required String horario,
+            required String descricao,
             required DateTime dateCreate,
             required DateTime dateUpdate,
           }) =>
@@ -440,6 +493,7 @@ class $$ClientTableTableTableManager extends RootTableManager<
             id: id,
             name: name,
             horario: horario,
+            descricao: descricao,
             dateCreate: dateCreate,
             dateUpdate: dateUpdate,
           ),

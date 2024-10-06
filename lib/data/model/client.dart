@@ -2,6 +2,7 @@ class Client {
   String id;
   String name;
   String horario;
+  String descricao;
   DateTime dateCreate;
   DateTime dateUpdate;
 
@@ -9,6 +10,7 @@ class Client {
     required this.id,
     required this.name,
     required this.horario,
+    required this.descricao,
     required this.dateCreate,
     required this.dateUpdate,
   });
@@ -17,6 +19,7 @@ class Client {
       : id = map["id"],
         name = map["name"],
         horario = map["horario"],
+        descricao = map["descricao"],
         dateCreate = DateTime.parse(map["dateCreate"]),
         dateUpdate = DateTime.parse(map["dateUpdate"]);
 
@@ -25,6 +28,7 @@ class Client {
       "id": id,
       "name": name,
       "horario": horario,
+      "descricao": descricao,
       "dateCreate": dateCreate.toString(),
       "dateUpdate": dateUpdate.toString(),
     };
