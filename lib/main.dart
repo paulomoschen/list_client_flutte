@@ -17,7 +17,7 @@ void main() {
       ),
       ChangeNotifierProvider(
         create: (context) {
-          final db = Provider.of<AppDatabase>(context, listen: false); 
+          final db = Provider.of<AppDatabase>(context, listen: false);
           final clientDao = ClientDao(db);
           return ClientProvider(clientDao);
         },

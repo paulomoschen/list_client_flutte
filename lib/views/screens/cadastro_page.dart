@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:list_client_flutter/utils/text_field_style.dart';
 import 'package:list_client_flutter/data/model/client.dart';
 import 'package:list_client_flutter/logic/client_provider.dart';
+import 'package:list_client_flutter/views/widgets/client_form_widget.dart';
 import 'package:provider/provider.dart';
 
 class CadastroPage extends StatefulWidget {
@@ -16,12 +16,15 @@ class _CadastroPageState extends State<CadastroPage> {
   final _nameController = TextEditingController();
   final _horarioController = TextEditingController();
   final _descricaoController = TextEditingController();
+  final _formKey = GlobalKey<FormState>();
 
   TimeOfDay? _selectedTime;
 
   @override
   void initState() {
-    _setAtributosUpdate();
+    if (widget.clientEdit != null) {
+      _setDataUpdate();
+    }
     super.initState();
   }
 
@@ -35,34 +38,12 @@ class _CadastroPageState extends State<CadastroPage> {
       body: Column(
         children: [
           Expanded(
-            child: Form(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 15),
-                child: Column(
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.only(top: 10),
-                      child: TextFormField(
-                        controller: _nameController,
-                        decoration: textFieldStyle(label: "Nome"),
-                      ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 10),
-                      child: TextFormField(
-                        controller: _horarioController,
-                        readOnly: true,
-                        onTap: () => _selectTime(context),
-                        decoration: textFieldStyle(label: "Horário"),
-                      ),
-                    ),
-                    TextFormField(
-                      controller: _descricaoController,
-                      decoration: textFieldStyle(label: "Descrição"),
-                    ),
-                  ],
-                ),
-              ),
+            child: ClientFormWidget(
+              formKey: _formKey,
+              nameController: _nameController,
+              horarioController: _horarioController,
+              descricaoController: _descricaoController,
+              selectTime: () => _selectTime(context),
             ),
           ),
           Container(
@@ -74,24 +55,26 @@ class _CadastroPageState extends State<CadastroPage> {
                     padding: const EdgeInsets.all(15),
                     child: TextButton(
                       onPressed: () {
-                        Client client = Client(
-                          id: "0",
-                          name: _nameController.text,
-                          horario: _horarioController.text,
-                          descricao: _descricaoController.text,
-                          dateCreate: DateTime.now(),
-                          dateUpdate: DateTime.now(),
-                        );
+                        if (_formKey.currentState?.validate() ?? false) {
+                          Client client = Client(
+                            id: "0",
+                            name: _nameController.text,
+                            horario: _horarioController.text,
+                            descricao: _descricaoController.text,
+                            dateCreate: DateTime.now(),
+                            dateUpdate: DateTime.now(),
+                          );
 
-                        if (widget.clientEdit == null) {
-                          clientProvider.insertClient(client);
-                        } else {
-                          client.id = widget.clientEdit!.id;
-                          client.dateCreate = widget.clientEdit!.dateCreate;
-                          clientProvider.updateClient(client);
+                          if (widget.clientEdit == null) {
+                            clientProvider.insertClient(client);
+                          } else {
+                            client.id = widget.clientEdit!.id;
+                            client.dateCreate = widget.clientEdit!.dateCreate;
+                            clientProvider.updateClient(client);
+                          }
+
+                          Navigator.pop(context);
                         }
-
-                        Navigator.pop(context);
                       },
                       style: TextButton.styleFrom(
                         backgroundColor: const Color(0xFF64B5F6),
@@ -114,12 +97,10 @@ class _CadastroPageState extends State<CadastroPage> {
     );
   }
 
-  _setAtributosUpdate(){
-    if(widget.clientEdit != null){
-      _nameController.text = widget.clientEdit!.name;
-      _horarioController.text = widget.clientEdit!.horario;
-      _descricaoController.text = widget.clientEdit!.descricao;
-    }
+  _setDataUpdate() {
+    _nameController.text = widget.clientEdit!.name;
+    _horarioController.text = widget.clientEdit!.horario;
+    _descricaoController.text = widget.clientEdit!.descricao;
   }
 
   Future<void> _selectTime(BuildContext context) async {

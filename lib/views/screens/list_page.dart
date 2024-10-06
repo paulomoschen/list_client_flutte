@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:list_client_flutter/data/model/client.dart';
 import 'package:list_client_flutter/views/screens/cadastro_page.dart';
 import 'package:list_client_flutter/logic/client_provider.dart';
+import 'package:list_client_flutter/views/widgets/client_card.dart';
 import 'package:provider/provider.dart';
 
 class ListPage extends StatefulWidget {
@@ -24,7 +25,7 @@ class _ListPageState extends State<ListPage> {
       appBar: AppBar(
         title: const Text("Lista de Horário"),
         bottom: PreferredSize(
-          preferredSize: const Size.fromHeight(50.0),
+          preferredSize: const Size.fromHeight(45.0),
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16.0),
             child: TextField(
@@ -46,7 +47,13 @@ class _ListPageState extends State<ListPage> {
       body: FutureBuilder(
           future: clientProvider.fetchClients(),
           builder: (context, snapshot) {
-            return Consumer<ClientProvider>(builder: (context, provider, child) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const Center(child: CircularProgressIndicator());
+            } else if (snapshot.hasError) {
+              return const Center(child: Text('Erro ao carregar horários.'));
+            }
+            return Consumer<ClientProvider>(
+                builder: (context, provider, child) {
               List<Client> listClient = provider.clients;
               if (listClient.isEmpty) {
                 return const Center(
@@ -64,37 +71,21 @@ class _ListPageState extends State<ListPage> {
                   itemCount: listClient.length,
                   itemBuilder: (context, index) {
                     Client client = listClient[index];
-                    return Card(
-                      child: ListTile(
-                        leading: const Icon(
-                          Icons.content_cut_outlined,
-                          size: 35,
-                        ),
-                        title: Text(
-                          "${client.name} - ${client.horario}hs",
-                          style: Theme.of(context).textTheme.titleLarge,
-                        ),
-                        subtitle: Text(client.descricao),
-                        trailing: IconButton(
-                          icon: const Icon(
-                            Icons.delete,
-                            color: Colors.red,
-                          ),
-                          onPressed: () async {
-                            provider.removeClients(int.parse(client.id));
-                          },
-                        ),
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => CadastroPage(
-                                clientEdit: client,
-                              ),
+                    return ClientCard(
+                      client: listClient[index],
+                      onDelete: () async {
+                        provider.removeClients(int.parse(client.id));
+                      },
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => CadastroPage(
+                              clientEdit: client,
                             ),
-                          );
-                        },
-                      ),
+                          ),
+                        );
+                      },
                     );
                   },
                 ),
