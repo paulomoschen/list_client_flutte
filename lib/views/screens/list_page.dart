@@ -29,7 +29,13 @@ class _ListPageState extends State<ListPage> {
             alignment: Alignment.centerRight,
             child: IconButton(
               icon: const Icon(Icons.search, color: Colors.black),
-              onPressed: () => clientProvider.switchSearch(),
+              onPressed: () {
+                if (clientProvider.searchVisible) {
+                  _searchController.clear();
+                  clientProvider.fetchClients();
+                }
+                clientProvider.switchSearch();
+              },
             ),
           )
         ],
