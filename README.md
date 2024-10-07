@@ -1,16 +1,6 @@
-# list_client_flutter
+# List Client Flutter
+É um aplicativo Flutter que permite gerenciar uma lista de horários, é utilizado a biblioteca Drift para gerenciar o banco de dados local. O aplicativo segue uma arquitetura em camadas e utiliza o Provider para gerenciamento de estado.
 
-A new Flutter project.
+mais informações sobre o drift: https://drift.simonbinder.eu/docs/getting-started/
 
-## Getting Started
-
-This project is a starting point for a Flutter application.
-
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+mais informações sobre o Provider: https://docs.flutter.dev/data-and-backend/state-mgmt/simple
