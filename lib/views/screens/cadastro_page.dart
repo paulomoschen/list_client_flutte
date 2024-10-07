@@ -46,50 +46,44 @@ class _CadastroPageState extends State<CadastroPage> {
               selectTime: () => _selectTime(context),
             ),
           ),
-          Container(
-            alignment: Alignment.bottomCenter,
-            child: Row(
-              children: [
-                Expanded(
-                  child: Padding(
-                    padding: const EdgeInsets.all(15),
-                    child: TextButton(
-                      onPressed: () {
-                        if (_formKey.currentState?.validate() ?? false) {
-                          Client client = Client(
-                            id: "0",
-                            name: _nameController.text,
-                            horario: _horarioController.text,
-                            descricao: _descricaoController.text,
-                            dateCreate: DateTime.now(),
-                            dateUpdate: DateTime.now(),
-                          );
+          SizedBox(
+            width: MediaQuery.of(context).size.width,
+            child: Padding(
+              padding: const EdgeInsets.all(15),
+              child: TextButton(
+                onPressed: () {
+                  if (_formKey.currentState?.validate() ?? false) {
+                    Client client = Client(
+                      id: "0",
+                      name: _nameController.text,
+                      horario: _horarioController.text,
+                      descricao: _descricaoController.text,
+                      dateCreate: DateTime.now(),
+                      dateUpdate: DateTime.now(),
+                    );
 
-                          if (widget.clientEdit == null) {
-                            clientProvider.insertClient(client);
-                          } else {
-                            client.id = widget.clientEdit!.id;
-                            client.dateCreate = widget.clientEdit!.dateCreate;
-                            clientProvider.updateClient(client);
-                          }
+                    if (widget.clientEdit == null) {
+                      clientProvider.insertClient(client);
+                    } else {
+                      client.id = widget.clientEdit!.id;
+                      client.dateCreate = widget.clientEdit!.dateCreate;
+                      clientProvider.updateClient(client);
+                    }
 
-                          Navigator.pop(context);
-                        }
-                      },
-                      style: TextButton.styleFrom(
-                        backgroundColor: const Color(0xFF64B5F6),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(15),
-                        ),
-                      ),
-                      child: Text(
-                        "Salvar",
-                        style: Theme.of(context).textTheme.titleMedium,
-                      ),
-                    ),
+                    Navigator.pop(context);
+                  }
+                },
+                style: TextButton.styleFrom(
+                  backgroundColor: const Color(0xFF64B5F6),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(15),
                   ),
                 ),
-              ],
+                child: Text(
+                  "Salvar",
+                  style: Theme.of(context).textTheme.titleMedium,
+                ),
+              ),
             ),
           )
         ],
@@ -101,6 +95,11 @@ class _CadastroPageState extends State<CadastroPage> {
     _nameController.text = widget.clientEdit!.name;
     _horarioController.text = widget.clientEdit!.horario;
     _descricaoController.text = widget.clientEdit!.descricao;
+
+    List<String> timeParts = widget.clientEdit!.horario.split(':');
+    int hour = int.parse(timeParts[0]);
+    int minute = int.parse(timeParts[1]);
+    _selectedTime = TimeOfDay(hour: hour, minute: minute);
   }
 
   Future<void> _selectTime(BuildContext context) async {

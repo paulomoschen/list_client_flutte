@@ -24,74 +24,77 @@ class _ListPageState extends State<ListPage> {
     return Scaffold(
       appBar: AppBar(
         title: const Text("Lista de Horário"),
-        bottom: PreferredSize(
-          preferredSize: const Size.fromHeight(45.0),
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16.0),
-            child: TextField(
-              controller: _searchController,
-              decoration: const InputDecoration(
-                hintText: 'Pesquisar',
-                suffixIcon: Icon(Icons.search),
-              ),
-              onChanged: (value) {
-                if (_debounce?.isActive ?? false) _debounce!.cancel();
-                _debounce = Timer(const Duration(milliseconds: 300), () {
-                  clientProvider.searchClients(value);
-                });
-              },
+        actions: [
+          Container(
+            alignment: Alignment.centerRight,
+            child: IconButton(
+              icon: const Icon(Icons.search, color: Colors.black),
+              onPressed: () => clientProvider.switchSearch(),
             ),
-          ),
-        ),
+          )
+        ],
       ),
-      body: FutureBuilder(
-          future: clientProvider.fetchClients(),
-          builder: (context, snapshot) {
-            if (snapshot.connectionState == ConnectionState.waiting) {
-              return const Center(child: CircularProgressIndicator());
-            } else if (snapshot.hasError) {
-              return const Center(child: Text('Erro ao carregar horários.'));
-            }
-            return Consumer<ClientProvider>(
-                builder: (context, provider, child) {
-              List<Client> listClient = provider.clients;
-              if (listClient.isEmpty) {
-                return const Center(
-                  child: Card(
-                    child: Padding(
-                      padding: EdgeInsets.all(15),
-                      child: Text('Nenhum horário encontrado.'),
-                    ),
-                  ),
-                );
-              }
-              return Padding(
-                padding: const EdgeInsets.only(top: 5),
-                child: ListView.builder(
-                  itemCount: listClient.length,
-                  itemBuilder: (context, index) {
-                    Client client = listClient[index];
-                    return ClientCard(
-                      client: listClient[index],
-                      onDelete: () async {
-                        provider.removeClients(int.parse(client.id));
-                      },
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => CadastroPage(
-                              clientEdit: client,
-                            ),
-                          ),
-                        );
-                      },
-                    );
-                  },
+      body: Column(
+        children: [
+          Consumer<ClientProvider>(builder: (context, provider, child) {
+            return AnimatedSwitcher(
+              duration: const Duration(milliseconds: 500),
+              child: Visibility(
+                visible: clientProvider.searchVisible,
+                child: Padding(
+                  padding: const EdgeInsets.only(top: 5, left: 5, right: 5),
+                  child: _buildSearchField(clientProvider),
                 ),
-              );
-            });
+              ),
+            );
           }),
+          Expanded(
+            child: FutureBuilder(
+                future: clientProvider.fetchClients(),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const Center(child: CircularProgressIndicator());
+                  } else if (snapshot.hasError) {
+                    return const Center(
+                        child: Text('Erro ao carregar horários.'));
+                  }
+                  return Consumer<ClientProvider>(
+                      builder: (context, provider, child) {
+                    List<Client> listClient = provider.clients;
+                    if (listClient.isEmpty) {
+                      return _buildEmptyState();
+                    }
+
+                    return Padding(
+                      padding: const EdgeInsets.only(top: 5),
+                      child: ListView.builder(
+                        itemCount: listClient.length,
+                        itemBuilder: (context, index) {
+                          Client client = listClient[index];
+                          return ClientCard(
+                            client: listClient[index],
+                            onDelete: () async {
+                              provider.removeClients(int.parse(client.id));
+                            },
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => CadastroPage(
+                                    clientEdit: client,
+                                  ),
+                                ),
+                              );
+                            },
+                          );
+                        },
+                      ),
+                    );
+                  });
+                }),
+          ),
+        ],
+      ),
       floatingActionButton: FloatingActionButton(
         onPressed: () => Navigator.push(
           context,
@@ -100,6 +103,38 @@ class _ListPageState extends State<ListPage> {
           ),
         ),
         child: const Icon(Icons.add),
+      ),
+    );
+  }
+
+  Widget _buildSearchField(ClientProvider provider) {
+    return TextField(
+      controller: _searchController,
+      decoration: const InputDecoration(
+        fillColor: Colors.white70,
+        filled: true,
+        hintText: 'Pesquisar',
+        border: UnderlineInputBorder(
+          borderRadius: BorderRadius.all(Radius.circular(5)),
+          borderSide: BorderSide(color: Colors.transparent),
+        ),
+      ),
+      onChanged: (value) {
+        if (_debounce?.isActive ?? false) _debounce!.cancel();
+        _debounce = Timer(const Duration(milliseconds: 300), () {
+          provider.searchClients(value);
+        });
+      },
+    );
+  }
+
+  Widget _buildEmptyState() {
+    return const Center(
+      child: Card(
+        child: Padding(
+          padding: EdgeInsets.all(15),
+          child: Text('Nenhum horário encontrado.'),
+        ),
       ),
     );
   }

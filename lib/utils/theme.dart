@@ -7,7 +7,7 @@ class ClientTheme {
     colorScheme: ColorScheme.fromSeed(
       seedColor: Colors.blue,
     ),
-    
+
     scaffoldBackgroundColor: const Color.fromARGB(223, 245, 245, 245),
 
     appBarTheme: const AppBarTheme(
@@ -62,6 +62,12 @@ class ClientTheme {
         fontSize: 15.0,
         color: Colors.black,
       ),
+    ),
+
+    inputDecorationTheme: const InputDecorationTheme(
+      labelStyle: TextStyle(fontSize: 18),
+      hintStyle: TextStyle(fontSize: 18.0),
+      alignLabelWithHint: true,
     ),
   );
 }
